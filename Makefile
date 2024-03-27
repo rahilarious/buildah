@@ -10,6 +10,7 @@ BINDIR := $(PREFIX)/bin
 BASHINSTALLDIR = $(PREFIX)/share/bash-completion/completions
 BUILDFLAGS := -tags "$(BUILDTAGS)"
 BUILDAH := buildah
+AS ?= as
 
 GO := go
 GO_LDFLAGS := $(shell if $(GO) version|grep -q gccgo; then echo "-gccgoflags"; else echo "-ldflags"; fi)
@@ -72,7 +73,7 @@ static:
 bin/buildah: $(SOURCES) cmd/buildah/*.go internal/mkcw/embed/entrypoint.gz
 	$(GO_BUILD) $(BUILDAH_LDFLAGS) $(GO_GCFLAGS) "$(GOGCFLAGS)" -o $@ $(BUILDFLAGS) ./cmd/buildah
 
-ifneq ($(shell as --version | grep x86_64),)
+ifneq ($(shell $(AS) --version | grep x86_64),)
 internal/mkcw/embed/entrypoint: internal/mkcw/embed/entrypoint.s
 	$(AS) -o $(patsubst %.s,%.o,$^) $^
 	$(LD) -o $@ $(patsubst %.s,%.o,$^)
